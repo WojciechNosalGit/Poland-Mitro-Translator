@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tłumacz Polsko-Mitrolski</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2em;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 0.95em;
+      }
+
+      .translator {
+        padding: 30px;
+      }
+
+      .lang-selector {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .lang-label {
+        font-size: 1.2em;
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      .swap-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.5em;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .swap-btn:hover {
+        transform: rotate(180deg);
+        background: #764ba2;
+      }
+
+      .text-area-container {
+        margin-bottom: 20px;
+      }
+
+      .text-area-container label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1em;
+        resize: vertical;
+        transition: border-color 0.3s;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .output {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        min-height: 150px;
+        font-size: 1em;
+        line-height: 1.6;
+      }
+
+      .pronunciation {
+        margin-top: 15px;
+        padding: 12px;
+        background: #e7e9fc;
+        border-radius: 8px;
+        font-size: 0.95em;
+        color: #667eea;
+        border-left: 4px solid #667eea;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .pronunciation strong {
+        color: #764ba2;
+      }
+
+      .speak-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.2em;
+        transition: all 0.3s;
+        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+      }
+
+      .speak-btn:hover {
+        background: #764ba2;
+        transform: scale(1.1);
+      }
+
+      .speak-btn:active {
+        transform: scale(0.95);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🌐 Tłumacz Polsko-Mitrolski</h1>
+        <p>
+          Oficjalny tłumacz języka Mitrolskiego - Rada Językowa Mitrolska 2025
+        </p>
+      </div>
+
+      <div class="translator">
+        <div class="lang-selector">
+          <span class="lang-label" id="lang-from">Polski</span>
+          <button class="swap-btn" onclick="swapLanguages()">⇄</button>
+          <span class="lang-label" id="lang-to">Mitrolski</span>
+        </div>
+
+        <div class="text-area-container">
+          <label for="input-text">Tekst do przetłumaczenia:</label>
+          <textarea id="input-text" placeholder="Wpisz tekst..."></textarea>
+        </div>
+
+        <div class="text-area-container">
+          <label>Wynik:</label>
+          <div class="output" id="output"></div>
+          <div class="pronunciation" id="pronunciation" style="display: none">
+            <span id="pronunciation-text"></span>
+            <button
+              class="speak-btn"
+              onclick="speakPronunciation()"
+              title="Odtwórz wymowę"
+            >
+              🔊
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Rozszerzony słownik polsko-angielski
+      const dictionary = {
+        kot: "cat",
+        pies: "dog",
+        dom: "house",
+        człowiek: "human",
+        kobieta: "woman",
+        mężczyzna: "man",
+        dziecko: "child",
+        rodzina: "family",
+        miłość: "love",
+        przyjaźń: "friendship",
+        przyjaciel: "friend",
+        dzień: "day",
+        noc: "night",
+        ogień: "fire",
+        woda: "water",
+        powietrze: "air",
+        ziemia: "earth",
+        koń: "horse",
+        krowa: "cow",
+        świnia: "pig",
+        owca: "sheep",
+        kura: "chicken",
+        mysz: "mouse",
+        las: "forest",
+        drzewo: "tree",
+        kwiat: "flower",
+        trawa: "grass",
+        kamień: "stone",
+        głowa: "head",
+        oko: "eye",
+        nos: "nose",
+        usta: "mouth",
+        ręka: "hand",
+        noga: "leg",
+        chleb: "bread",
+        mleko: "milk",
+        woda: "water",
+        sok: "juice",
+        herbata: "tea",
+        kawa: "coffee",
+        czerwony: "red",
+        niebieski: "blue",
+        zielony: "green",
+        żółty: "yellow",
+        czarny: "black",
+        biały: "white",
+        jeden: "one",
+        dwa: "two",
+        trzy: "three",
+        cztery: "four",
+        pięć: "five",
+        dzisiaj: "today",
+        jutro: "tomorrow",
+        wczoraj: "yesterday",
+        teraz: "now",
+        rano: "morning",
+        wieczór: "evening",
+        wieczorem: "evening",
+        jest: "is",
+        był: "was",
+        będzie: "will",
+        ma: "has",
+        mam: "have",
+        dobry: "good",
+        zły: "bad",
+        duży: "big",
+        mały: "small",
+        i: "and",
+        lub: "or",
+        ale: "but",
+        w: "in",
+        na: "on",
+        z: "with",
+        mama: "mom",
+        tata: "dad",
+        syn: "son",
+        córka: "daughter",
+        ptak: "bird",
+        ryba: "fish",
+        się: "",
+      };
+
+      const forbidden = ["t", "c", "x", "q", "w", "a"];
+      const silentEnd = ["e", "h", "d"];
+      const silentStart = ["n", "h", "y", "o"];
+
+      let currentPronunciation = "";
+      let isPolishToMitrolski = true;
+
+      // Odwrotny słownik (Mitrolski → Polski)
+      const reverseDictionary = {};
+      for (let [polish, english] of Object.entries(dictionary)) {
+        const cleaned = removeForbidden(english);
+        const mitrolski =
+          cleaned === ""
+            ? reverseWord(polish.toLowerCase())
+            : reverseWord(cleaned);
+        reverseDictionary[mitrolski] = polish;
+      }
+
+      function normalizePolish(text) {
+        const polishChars = {
+          ą: "a",
+          ć: "c",
+          ę: "e",
+          ł: "l",
+          ń: "n",
+          ó: "o",
+          ś: "s",
+          ź: "z",
+          ż: "z",
+          Ą: "A",
+          Ć: "C",
+          Ę: "E",
+          Ł: "L",
+          Ń: "N",
+          Ó: "O",
+          Ś: "S",
+          Ź: "Z",
+          Ż: "Z",
+        };
+        return text
+          .split("")
+          .map((c) => polishChars[c] || c)
+          .join("");
+      }
+
+      function removeForbidden(word) {
+        return word
+          .split("")
+          .filter((c) => !forbidden.includes(c.toLowerCase()))
+          .join("");
+      }
+
+      function reverseWord(word) {
+        return word.split("").reverse().join("");
+      }
+
+      function getPronunciation(mitrolskiWord) {
+        let result = mitrolskiWord;
+
+        if (
+          result.length > 0 &&
+          silentEnd.includes(result[result.length - 1].toLowerCase())
+        ) {
+          result = result.slice(0, -1);
+        }
+
+        if (
+          result.length > 0 &&
+          silentStart.includes(result[0].toLowerCase())
+        ) {
+          result = result.slice(1);
+        }
+
+        return result;
+      }
+
+      function toRoman(num) {
+        const romanNumerals = [
+          ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"],
+        ];
+        return romanNumerals[0][num] || num.toString();
+      }
+
+      function convertToMitrolskiNumber(number) {
+        if (number < 10) {
+          return number.toString();
+        }
+
+        const digits = number.toString().split("");
+        const result = [];
+        let shouldBeRoman = false;
+
+        for (let i = 0; i < digits.length; i++) {
+          const digit = parseInt(digits[i]);
+          const isFirst = i === 0;
+
+          if (isFirst) {
+            result.push(digit.toString());
+            shouldBeRoman = true;
+          } else {
+            if (shouldBeRoman) {
+              if (digit === 0) {
+                result.push("0");
+              } else {
+                result.push(toRoman(digit));
+              }
+              shouldBeRoman = false;
+            } else {
+              result.push(digit.toString());
+              shouldBeRoman = true;
+            }
+          }
+        }
+
+        return result.join("");
+      }
+
+      function numberToMitrolski(num) {
+        // Pomocnicza - konwertuj jedno angielskie słowo
+        const conv = (eng) => {
+          if (!eng) return "";
+          let w = eng;
+          w = w
+            .split("")
+            .filter(
+              (c) => !["t", "c", "x", "q", "w", "a"].includes(c.toLowerCase())
+            )
+            .join("");
+          if (!w) return "";
+          w = w.split("").reverse().join("");
+          if (
+            w.length > 0 &&
+            ["e", "h", "d"].includes(w[w.length - 1].toLowerCase())
+          ) {
+            w = w.slice(0, -1);
+          }
+          if (
+            w.length > 0 &&
+            ["n", "h", "y", "o"].includes(w[0].toLowerCase())
+          ) {
+            w = w.slice(1);
+          }
+          return w;
+        };
+
+        // Pomocnicza - konwertuj liczbę 0-999 na słowa
+        const convertUnder1000 = (n) => {
+          const ones = [
+            "",
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six",
+            "seven",
+            "eight",
+            "nine",
+          ];
+          const teens = [
+            "ten",
+            "eleven",
+            "twelve",
+            "thirteen",
+            "fourteen",
+            "fifteen",
+            "sixteen",
+            "seventeen",
+            "eighteen",
+            "nineteen",
+          ];
+          const tens = [
+            "",
+            "",
+            "twenty",
+            "thirty",
+            "forty",
+            "fifty",
+            "sixty",
+            "seventy",
+            "eighty",
+            "ninety",
+          ];
+
+          let p = [];
+
+          // Setki
+          if (n >= 100) {
+            let h = Math.floor(n / 100);
+            p.push(conv(ones[h]));
+            p.push(conv("hundred"));
+            n %= 100;
+          }
+
+          // 10-99
+          if (n >= 20) {
+            let td = Math.floor(n / 10);
+            let to = n % 10;
+            p.push(conv(tens[td]));
+            if (to > 0) p.push(conv(ones[to]));
+          } else if (n >= 10) {
+            p.push(conv(teens[n - 10]));
+          } else if (n > 0) {
+            p.push(conv(ones[n]));
+          }
+
+          return p.filter((x) => x).join(" ");
+        };
+
+        if (num === 0) return conv("zero");
+
+        let parts = [];
+        let n = num;
+
+        // Tryliony
+        if (n >= 1000000000000) {
+          let t = Math.floor(n / 1000000000000);
+          parts.push(convertUnder1000(t));
+          parts.push(conv("trillion"));
+          n %= 1000000000000;
+        }
+
+        // Biliony
+        if (n >= 1000000000) {
+          let b = Math.floor(n / 1000000000);
+          parts.push(convertUnder1000(b));
+          parts.push(conv("billion"));
+          n %= 1000000000;
+        }
+
+        // Miliony
+        if (n >= 1000000) {
+          let m = Math.floor(n / 1000000);
+          parts.push(convertUnder1000(m));
+          parts.push(conv("million"));
+          n %= 1000000;
+        }
+
+        // Tysiące
+        if (n >= 1000) {
+          let th = Math.floor(n / 1000);
+          parts.push(convertUnder1000(th));
+          parts.push(conv("thousand"));
+          n %= 1000;
+        }
+
+        // 0-999
+        if (n > 0) {
+          parts.push(convertUnder1000(n));
+        }
+
+        const result = parts.filter((p) => p).join(" ");
+        return result;
+      }
+
+      function translateWord(polishWord) {
+        const punctuationMatch = polishWord.match(/^(.+?)([!?.,;:]+)$/);
+        let word = polishWord;
+        let punctuation = "";
+
+        if (punctuationMatch) {
+          word = punctuationMatch[1];
+          punctuation = punctuationMatch[2];
+        }
+
+        const numberWithSeparator = word.match(/^(\d+)([:.,\/\-])(\d+)(.*)$/);
+        if (numberWithSeparator) {
+          const num1 = parseInt(numberWithSeparator[1]);
+          const separator = numberWithSeparator[2];
+          const num2 = parseInt(numberWithSeparator[3]);
+          const suffix = numberWithSeparator[4];
+
+          const mitrolski1 = convertToMitrolskiNumber(num1);
+          const mitrolski2 = convertToMitrolskiNumber(num2);
+          const pronunciation1 = numberToMitrolski(num1);
+          const pronunciation2 = numberToMitrolski(num2);
+
+          return {
+            mitrolski:
+              mitrolski1 + separator + mitrolski2 + suffix + punctuation,
+            pronunciation: pronunciation1 + " " + pronunciation2,
+            details: null,
+          };
+        }
+
+        if (/^\d+$/.test(word)) {
+          const num = parseInt(word);
+          const mitrolskiNum = convertToMitrolskiNumber(num);
+          const mitrolskiPronunciation = numberToMitrolski(num);
+
+          return {
+            mitrolski: mitrolskiNum + punctuation,
+            pronunciation: mitrolskiPronunciation,
+            details: null,
+          };
+        }
+
+        const normalized = normalizePolish(word);
+        const lower = normalized.toLowerCase();
+        const english = dictionary[lower];
+
+        if (english === "") {
+          return { mitrolski: punctuation, pronunciation: "", details: null };
+        }
+
+        // Jeśli słowo jest w słowniku - zastosuj pełne reguły
+        if (english) {
+          const cleaned = removeForbidden(english);
+          const mitrolski = reverseWord(cleaned);
+          const pronunciation = getPronunciation(mitrolski);
+
+          // Jeśli wymowa pusta (wszystko usunięte) - odwróć polskie bez reguł
+          if (!pronunciation || pronunciation === "") {
+            const polishCleaned = removeForbidden(lower);
+            const polishReversed = reverseWord(polishCleaned);
+            return {
+              mitrolski: polishReversed + punctuation,
+              pronunciation: polishReversed,
+              details: null,
+            };
+          }
+
+          return {
+            mitrolski: mitrolski + punctuation,
+            pronunciation,
+            details: null,
+          };
+        }
+
+        // Jeśli słowa NIE MA w słowniku - odwróć polskie bez reguł niemych
+        const polishCleaned = removeForbidden(lower);
+        const polishReversed = reverseWord(polishCleaned);
+
+        return {
+          mitrolski: polishReversed + punctuation,
+          pronunciation: polishReversed,
+          details: null,
+        };
+      }
+
+      function translate() {
+        const input = document.getElementById("input-text").value;
+        const output = document.getElementById("output");
+        const pronunciation = document.getElementById("pronunciation");
+        const pronunciationText = document.getElementById("pronunciation-text");
+
+        if (!input.trim()) {
+          output.textContent = "";
+          pronunciation.style.display = "none";
+          return;
+        }
+
+        if (isPolishToMitrolski) {
+          // Polski → Mitrolski
+          const words = input.split(/\s+/);
+          const results = words.map((w) => translateWord(w));
+          output.textContent = results.map((r) => r.mitrolski).join(" ");
+
+          const pronunciations = results.map((r) => r.pronunciation).join(" ");
+          currentPronunciation = pronunciations;
+          pronunciationText.innerHTML =
+            "<strong>Wymowa:</strong> " + pronunciations;
+          pronunciation.style.display = "flex";
+        } else {
+          // Mitrolski → Polski
+          const words = input.split(/\s+/);
+          const results = words.map((w) => {
+            const lower = w.toLowerCase();
+            return reverseDictionary[lower] || w;
+          });
+          output.textContent = results.join(" ");
+          pronunciation.style.display = "none";
+        }
+      }
+
+      function swapLanguages() {
+        isPolishToMitrolski = !isPolishToMitrolski;
+
+        const langFrom = document.getElementById("lang-from");
+        const langTo = document.getElementById("lang-to");
+        const pronunciation = document.getElementById("pronunciation");
+
+        if (isPolishToMitrolski) {
+          langFrom.textContent = "Polski";
+          langTo.textContent = "Mitrolski";
+        } else {
+          langFrom.textContent = "Mitrolski";
+          langTo.textContent = "Polski";
+        }
+
+        document.getElementById("input-text").value = "";
+        document.getElementById("output").textContent = "";
+        pronunciation.style.display = "none";
+      }
+
+      function makePhonetic(word) {
+        if (/^\d+$/.test(word)) return word;
+
+        const vowelCount = (word.match(/[aeiou]/gi) || []).length;
+
+        if (vowelCount < 2 || word.length <= 3) {
+          let result = "";
+          for (let i = 0; i < word.length; i++) {
+            result += word[i];
+            if (
+              i < word.length - 1 &&
+              !/[aeiou]/i.test(word[i]) &&
+              !/[aeiou]/i.test(word[i + 1])
+            ) {
+              result += "uh";
+            }
+          }
+          return result;
+        }
+
+        return word;
+      }
+
+      function speakPronunciation() {
+        if (!currentPronunciation) return;
+
+        const words = currentPronunciation
+          .split(" ")
+          .map((word) => makePhonetic(word));
+        const textWithPauses = words.join(", ");
+
+        const utterance = new SpeechSynthesisUtterance(textWithPauses);
+        utterance.lang = "en-US";
+        utterance.rate = 0.85;
+        utterance.pitch = 1.0;
+
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utterance);
+      }
+
+      document
+        .getElementById("input-text")
+        .addEventListener("input", translate);
+    </script>
+  </body>
+</html>
